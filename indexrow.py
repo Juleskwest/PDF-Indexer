@@ -8,7 +8,7 @@ class IndexRow(ttk.Frame):
         self.width = kw.pop('width', None)
         self.height = kw.pop('height', None)
         super(IndexRow, self).__init__(master=master, **kw)
-        self.logger = Logger()
+        self.logger = Logger(__name__)
         self.columnconfigure(0, weight=0)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=0)

@@ -7,7 +7,7 @@ from logger import Logger
 class Backend:
     def __init__(self) -> None:
         self.resetVariables()
-        self.logger = Logger()
+        self.logger = Logger(__name__)
         self.logger.info("Starting backend")
 
         self.appConfigManager = configMan.AppConfig("config.ini")
@@ -33,7 +33,7 @@ class Backend:
         except ValueError as err:
             if err.__str__() != "document closed":
                 self.logger.exception("Error on closing PDF on program exit VAL EEROR")
-        self.logger.info("A - INFO  - Exited")
+        self.logger.info("Backend Exited")
     
     def newSession(self, sessionName) -> None:
         self.logger.info(f"Creating Session {sessionName}")

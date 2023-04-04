@@ -11,7 +11,7 @@ from logger import Logger
 
 class App:
     def __init__(self) -> None:
-        self.logger = Logger()
+        self.logger = Logger("main")
         self.logger.info("App Started")
 
         self.root = tkinter.Tk()

@@ -5,7 +5,7 @@ from logger import Logger
 class ConfigManager:
     def __init__(self, configfilePath) -> None:
         self.configFilePath = configfilePath
-        self.logger = Logger()
+        self.logger = Logger(__name__)
         self.config = configparser.RawConfigParser()
         if os.path.isfile(self.configFilePath):
             self.load()

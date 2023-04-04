@@ -1,15 +1,14 @@
 import logging
+import sys
 
 class Logger:
-    def __init__(self, logfile="file.log") -> None:
+    def __init__(self, name, logfile="file.log") -> None:
         self.logfile = logfile
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(f"{name:10}")
 
         # Handlers
-        self.c_handler = logging.StreamHandler()
+        self.c_handler = logging.StreamHandler(stream = sys.stdout)
         self.f_handler = logging.FileHandler(self.logfile)
-        self.c_handler.setLevel(logging.INFO)
-        self.f_handler.setLevel(logging.ERROR)
 
         # Formats
         self.c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
@@ -19,6 +18,8 @@ class Logger:
 
         self.logger.addHandler(self.c_handler)
         self.logger.addHandler(self.f_handler)
+        self.logger.setLevel(logging.DEBUG)
+        self.f_handler.setLevel(logging.ERROR)
     
     def debug(self, message):
         self.logger.debug(message)
