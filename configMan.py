@@ -1,9 +1,11 @@
 import configparser
 import os
+from logger import Logger
 
 class ConfigManager:
     def __init__(self, configfilePath) -> None:
         self.configFilePath = configfilePath
+        self.logger = Logger()
         self.config = configparser.RawConfigParser()
         if os.path.isfile(self.configFilePath):
             self.load()
@@ -12,10 +14,10 @@ class ConfigManager:
     
     def load(self):
         self.config.read(self.configFilePath)
-        print(f"C - INFO  - {self.configFilePath} Loaded")
+        self.logger.info(f"{self.configFilePath} Loaded")
 
     def default(self):
-        print("C - INFO  - Default Config Created")
+        self.logger.info("Default Config Created")
         self.save()
     
     def edit(self, cat, option, value):
@@ -25,9 +27,9 @@ class ConfigManager:
         try:
             with open(self.configFilePath, 'w') as configfile:
                 self.config.write(configfile)
-                print(f"C - INFO  - {self.configFilePath} Saved")
+                self.logger.info(f"{self.configFilePath} Saved")
         except FileNotFoundError:
-            print(f"C - ERROR - {self.configFilePath} cannot be saved")
+            self.logger.exception(f"{self.configFilePath} cannot be saved")
 
 class AppConfig(ConfigManager):
     def __init__(self, configfilePath) -> None:
@@ -36,7 +38,7 @@ class AppConfig(ConfigManager):
     def default(self):
         self.config["APP"] = {"lastSession": ""}
         self.config["SETTINGS"] = {"fontSize": 14}
-        print("C - INFO  - App Config Created")
+        self.logger.info("App Config Created")
         self.save()
 
 class SessionConfig(ConfigManager):
@@ -48,5 +50,5 @@ class SessionConfig(ConfigManager):
         self.config["DETAILS"] = {"lastPage":"1", "lastBook":"1", "zoomMain": "1.0"}
         self.config["INDEX"] = {"filePath": ""}
         self.config["BOOKS"] = {}
-        print("C - INFO  - Session Config Created")
+        self.logger.info("Session Config Created")
         self.save()

@@ -1,6 +1,7 @@
 import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
+from logger import Logger
 
 class PDFViewer(ttk.Frame):
     def __init__(self, master=None, **kw):
@@ -10,6 +11,7 @@ class PDFViewer(ttk.Frame):
         self.height = kw.pop('height', None)
         self.zoomlevel = kw.pop('zoom', None)
         super(PDFViewer, self).__init__(master=master, **kw)
+        self.logger = Logger()
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=0)
         self.columnconfigure(2, weight=0)
@@ -68,7 +70,7 @@ class PDFViewer(ttk.Frame):
         self.func(self.zoomlevel)
 
     def proccessPixmap(self):
-        print(self.zoomlevel)
+        self.logger.info(self.zoomlevel)
         mode = "RGBA" if self.pixmap.alpha else "RGB"
         img = Image.frombytes(mode, [self.pixmap.width, self.pixmap.height], self.pixmap.samples)
         width = int(self.pixmap.width * self.zoomlevel)
@@ -78,13 +80,13 @@ class PDFViewer(ttk.Frame):
         self.image = ImageTk.PhotoImage(resizedImage)
 
     def _bindMouseWheel(self, event):
-        print("Bound")
+        self.logger.info("Bound")
         self.bind_all("<MouseWheel>", self._onMouseWheelVert)
         self.bind_all("<Shift-MouseWheel>", self._onMouseWheelHori)
         self.bind_all("<Control-MouseWheel>", self._onMouseWheelZoom)
     
     def _unbindMouseWheel(self, event):
-        print("unBound")
+        self.logger.info("unBound")
         self.unbind_all("<MouseWheel>")
         self.unbind_all("<Shift-MouseWheel>")
         self.unbind_all("<Control-MouseWheel>")
@@ -105,7 +107,7 @@ class PDFViewer(ttk.Frame):
             self.zoomOut()
 
     def test(self):
-        print("from pdf viewer class")
+        self.logger.info("from pdf viewer class")
 
     def addImage(self, image):
         self.image = ImageTk.PhotoImage(image)
@@ -129,100 +131,16 @@ class PDFViewer(ttk.Frame):
     
     def resize(self, event=None):
         if(event.widget == self and (self.rewidth != event.width or self.reheight != event.height)):
-            print(f'T - INFO  - Canvas {event.widget}: {event.height}, {event.width}')
+            self.logger.info(f'T - INFO  - Canvas {event.widget}: {event.height}, {event.width}')
             self.rewidth, self.reheight = event.width, event.height
             self.update(event.width, event.height)
-            # resize here
-            # if size is smaller than canvas cut canvas to image size else cut canvas to match view port and move image to center
         
     def zoomIn(self, event=None):
         self.zoomlevel += 0.1
         self.proccessPixmap()
         self.update()
-        pass #will have to resize the image will pillow and update label/selection box
 
     def zoomOut(self, event=None):
         self.zoomlevel -= 0.1
         self.proccessPixmap()
         self.update()
-        pass # will have to resize the image with pillow and update label
-
-
-class App:
-    def __init__(self) -> None:
-        print("T - INFO  - App Started")
-
-        self.root = tkinter.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.__del__)
-        #self.root.bind("<Configure>", self.resize)
-        self.width:int=None
-        self.height:int=None
-        
-        self.mainPixmap = None
-
-        self.width = 300
-        self.height = 300
-
-        ## Style Seclection
-        #self.style = ttk.Style()
-        #self.changestyle()
-        #self.root.call("source", "arc.tcl")
-        #self.style.theme_use("arc")
-
-
-        #self.createWidgets()
-
-        self.setup()
-
-        self.root.title("PDF Indexer.")
-    
-    def __del__(self) -> None:
-        try:
-            self.root.destroy()
-        except tkinter.TclError as err:
-            if err.__str__() != "can't invoke \"destroy\" command: application has been destroyed":
-                print(f"T - ERROR - Tcl Error on exit")
-                print(err)
-        finally:
-            print("T - INFO  - Exited from __del__")
-
-    def run(self) -> None:
-        print("T - INFO  - Running")
-        self.root.mainloop()
-
-    def exit(self, event=None):
-        self.root.quit()
-        print("T - INFO  - Exited from exit()")
-
-    def setup(self):
-        self.framePDF = PDFViewer(self.root)
-        self.framePDF.pack()
-
-    
-    def test(self, event=None):
-        print("test")
-
-if __name__ == "__main__":
-    app = App()
-    app.run()
-
-'''
-    if self.mainPixmap == None:
-        self.mainPixmap = self.backend.getPagePixmap(1, 3)
-    mode = "RGBA" if self.mainPixmap.alpha else "RGB"
-    img = Image.frombytes(mode, [self.mainPixmap.width, self.mainPixmap.height], self.mainPixmap.samples)
-    ## have a setting here to check if user had set a zoom level
-
-    #width = self.pdfRender.winfo_width() - 4 # Stop weird movement
-    height  = self.pdfRender.winfo_height() - 10 # Stop weird movement
-    # set ratio here to lock width to height avaliable
-    width = int(height // (self.mainPixmap.height/self.mainPixmap.width))
-
-    size = (width, height)
-    resizedImage = img.resize(size, Image.LANCZOS)
-    frame_image = ImageTk.PhotoImage(resizedImage)
-
-    self.pdfRender.config(image=frame_image)
-    self.pdfRender.image = frame_image
-    
-'''
