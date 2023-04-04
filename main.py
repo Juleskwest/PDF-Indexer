@@ -7,16 +7,17 @@ import os
 import backend
 from pdfviewer import PDFViewer
 from indexrow import IndexRow
+from logger import Logger
 
 class App:
     def __init__(self) -> None:
-        print("T - INFO  - App Started")
+        self.logger = Logger()
+        self.logger.info("App Started")
 
         self.root = tkinter.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.__del__)
         self.root.bind("<Configure>", self.resize)
         self.backend = backend.Backend()
-
 
         ## Style Seclection
         self.style = ttk.Style()
@@ -31,7 +32,6 @@ class App:
         self.root.title("PDF Indexer.")
         if self.backend.currentSession != "":
             self.root.title(f"PDF Indexer. Current Session: {self.backend.currentSession}")
-            print(self.notebook.select())
             self.notebook.select(1)
             self.PDFpdfviewer.zoomlevel = self.backend.getPDFzoom()
             self.Mainpdfviewer.zoomlevel = self.backend.getMAINzoom()
@@ -49,21 +49,20 @@ class App:
             self.root.destroy()
         except tkinter.TclError as err:
             if err.__str__() != "can't invoke \"destroy\" command: application has been destroyed":
-                print(f"T - ERROR - Tcl Error on exit")
-                print(err)
+                self.logger.exception("Tcl Error on exit")
         finally:
-            print("T - INFO  - Exited from __del__")
+            self.logger.info("Exited from __del__")
 
     def run(self) -> None:
-        print("T - INFO  - Running")
+        self.logger.info("Mainloop Running")
         self.root.mainloop()
 
     def exit(self, event=None):
         self.root.quit()
-        print("T - INFO  - Exited from exit()")
+        self.logger.info("Exited from exit()")
 
     def changestyle(self) -> None:
-        print("T - INFO  - Change Style")
+        self.logger.info("Change Style")
         ## Will need to clean the colours up
         MainBGColor = "#2d2d2d"
         subBGColor = "#252526"
@@ -96,7 +95,7 @@ class App:
                  )
 
     def createWidgets(self) -> None:
-        print("T - INFO  - Create Widgets")
+        self.logger.info("Create Widgets")
         ####### Menu Bar ############
         self.menu = tkinter.Menu(self.root)
         self.root.config(menu=self.menu)
@@ -236,7 +235,7 @@ class App:
         self.button6.pack()
 
     def openTXTFile(self, event=None) -> None:
-        print("T - INFO  - Open a Text file")
+        self.logger.info("Open a Text file")
         with filedialog.askopenfile(mode="r") as file:
             fileName = os.path.basename(file.name)
             self.openTabs[fileName] = [ttk.Frame(self.notebook, width=400, height=280), None, None]
@@ -250,61 +249,61 @@ class App:
             self.openTabs[fileName][1]["yscrollcommand"] = self.openTabs[fileName][2].set
 
     def openSession(self, event=None) -> None:
-        print("T - INFO  - Openning a Session")
+        self.logger.info("Openning a Session")
         session = filedialog.askdirectory(mustexist=True)
         sessionName = os.path.basename(session)
         self.backend.openSession(sessionName)
         self.root.title(f"PDF Indexer. Current Session: {self.backend.currentSession}")
 
     def closeSession(self, event=None) -> None:
-        print("T - INFO  - closing a Session")
+        self.logger.info("Closing a Session")
         self.backend.closeSession()
         self.root.title("PDF Indexer.")
 
     def newSession(self, event=None) -> None:
-        print("T - INFO  - New Session")
+        self.logger.info("New Session")
         sessionName = simpledialog.askstring(title="New Session", prompt="New Session Name:")
         self.backend.closeSession()
         self.backend.newSession(sessionName)
         self.root.title(f"PDF Indexer. Current Session: {self.backend.currentSession}")
 
     def addPDF(self, event=None) -> None:
-        print("T - INFO  - add a PDF file to session")
+        self.logger.info("Add a PDF file to session")
         filePath:str = filedialog.askopenfilename()
         self.backend.addPDFPath(filePath)
         ## Add info the PDF TAB here
 
     def addPDFPassword(self, event=None) -> None:
-        print("T - INFO  - Ask for PDF Password Session")
+        self.logger.info("Ask for PDF Password Session")
         password = simpledialog.askstring(title="PDF Password", prompt="PDF Password:")
         self.backend.addPDFPassword(password)
 
     def openPDF(self, event=None) -> None:
         if self.backend.currentSession == "":
-            print("T - ERROR - No Open Session can't open PDF")
+            self.logger.error("No Open Session can't open PDF")
             return
         elif self.backend.sessionConfigManager.config["PDF"]["filepath"] == "":
-            print("T - ERROR - No PDF to open")
+            self.logger.error("No PDF to open")
             return
         self.backend.openPDF()
 
     def proccessPDF(self, event=None) -> None:
         if self.backend.currentSession == "":
-            print("T - ERROR - No Open Session can't open PDF")
+            self.logger.error("No Open Session can't open PDF")
             return
         elif self.backend.sessionConfigManager.config["PDF"]["filepath"] == "":
             self.openPDF()
-        print("T - INFO  - proccess PDF")
+        self.logger.info("Proccess PDF")
         self.backend.prepPDF()
 
     def updateMain(self, event=None) -> None:
         self.textMain.delete("1.0", tkinter.END)
         self.textMain.insert(tkinter.END, self.backend.getPageText())
         self.Mainpdfviewer.addPixmap(self.backend.getPagePixmap())
-        print("T - INFO  - Update Main Tab")
+        self.logger.info("Update Main Tab")
 
     def updateIndex(self, event=None):
-        print("Chnaged to Index")
+        self.logger.info("Changed to Index")
         self.indexText.delete(0.0, tkinter.END)
         tmp = ""
         for line in self.backend.index:
@@ -321,12 +320,11 @@ class App:
             case "Index":
                 self.updateIndex()
             case _:
-                print(f"T - INFO  - Switched to {currentTab}")
+                self.logger.info(f"Switched to {currentTab}")
 
     def resize(self, event=None) -> None:
         if(event.widget == self.root and
            (self.width != event.width or self.height != event.height)):
-            #print(f'T - INFO  - {event.widget=}: {event.height=}, {event.width=}')
             self.width, self.height = event.width, event.height
             currentTab = self.getCurrentTab()
             match currentTab:
@@ -336,7 +334,7 @@ class App:
                     #self.updateMainImage()
                     pass
                 case _:
-                    print(f"T - INFO  - Resized")
+                    self.logger.info(f"Resized")
 
     def getCurrentTab(self) -> str:
         return self.notebook.tab(self.notebook.select(), "text")
@@ -356,7 +354,7 @@ class App:
         self.updateMain()
 
     def test(self, event=None):
-        print("T - INFO  - Test Run")
+        self.logger.info("Test Run")
         self.indexrow.save()
     
     def testAdd(self, event=None):
