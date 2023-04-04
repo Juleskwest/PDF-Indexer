@@ -17,6 +17,7 @@ class App:
         self.root = tkinter.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.__del__)
         self.root.bind("<Configure>", self.resize)
+        self.root.minsize(800,400)
         self.backend = backend.Backend()
 
         ## Style Seclection
@@ -148,91 +149,98 @@ class App:
         self.notebook.bind('<<NotebookTabChanged>>', self.notebookTABChange)
         self.notebook.pack(fill="both", expand=True)
 
-        ## Welcome Tab ##
-        self.frameWelcome = ttk.Frame(self.notebook, width=400, height=280)
-        self.frameWelcome.pack(fill="both", expand=True)
-        self.notebook.add(self.frameWelcome, text="Welcome")
-        self.button1 = ttk.Button(self.frameWelcome, text="change Title", command=self.test)
-        self.button1.pack()
+        if self.backend.currentSession == "":
+            self.openWelcomeTab()
+        else:
+            self.openMainTab()
+            self.openIndex()
+            self.openPDFTab()
+            self.openSearchTab()
+            self.openConfigTab()
 
-        ## Main Tab ##
-        self.frameMain = ttk.Frame(self.notebook, width=400, height=280)
-        self.frameMain.pack(fill="both", expand=True)
-        self.notebook.add(self.frameMain, text="Main")
-        self.frameMain.columnconfigure(0, weight=0)
-        self.frameMain.columnconfigure(1, weight=2)
-        self.frameMain.columnconfigure(2, weight=3)
-        self.frameMain.columnconfigure(3, weight=0)
-        self.frameMain.rowconfigure(0, weight=0)
-        self.frameMain.rowconfigure(1, weight=1)
+    def openWelcomeTab(self):
+            self.frameWelcome = ttk.Frame(self.notebook, width=800, height=400)
+            self.frameWelcome.pack(fill="both", expand=True)
+            self.notebook.add(self.frameWelcome, text="Welcome")
+            self.frameWelcome.columnconfigure(0, weight=1)
+            self.frameWelcome.columnconfigure(1, weight=0)
+            self.frameWelcome.columnconfigure(2, weight=1)
+            self.frameWelcome.rowconfigure(0, weight=1)
+            self.frameWelcome.rowconfigure(1, weight=0)
+            self.frameWelcome.rowconfigure(2, weight=0)
+            self.frameWelcome.rowconfigure(3, weight=3)
 
-        ## 0
+            self.welcomeButtonNewSession = ttk.Button(self.frameWelcome, text="Create New Session", command=self.newSession)
+            self.welcomeButtonNewSession.grid(column=1,row=1,sticky="ew")
+            self.welcomeButtonOpenSession = ttk.Button(self.frameWelcome, text="Open New Session", command=self.openSession)
+            self.welcomeButtonOpenSession.grid(column=1,row=2,sticky="ew")
 
-        ## 1
-        self.Mainpdfviewer = PDFViewer(self.frameMain)
-        self.Mainpdfviewer.grid(column=1, row=0, rowspan=2, sticky="news")
-        self.Mainpdfviewer.addSaveSettingFunc(self.backend.saveMAINzoom)
+    def openMainTab(self):
+            self.frameMain = ttk.Frame(self.notebook, width=400, height=280)
+            self.frameMain.pack(fill="both", expand=True)
+            self.notebook.add(self.frameMain, text="Main")
+            self.frameMain.columnconfigure(0, weight=0)
+            self.frameMain.columnconfigure(1, weight=2)
+            self.frameMain.columnconfigure(2, weight=3)
+            self.frameMain.columnconfigure(3, weight=0)
+            self.frameMain.rowconfigure(0, weight=0)
+            self.frameMain.rowconfigure(1, weight=1)
 
-        ## 2
-        self.textMain = readonlytext.ReadOnlyText(self.frameMain, font=('TkFixedFont bold', self.backend.appConfigManager.config["SETTINGS"]["fontSize"]))
-        self.textMain.grid(column=2, row=1, sticky="news")
-        
-        
-        self.MainControlsFrame = ttk.Frame(self.frameMain)
-        self.MainPrevPage = ttk.Button(self.MainControlsFrame, text="Prev Page", command=self.prevPageMain)
-        self.MainPrevPage.pack(fill="x", expand=True, side=tkinter.LEFT)
-        self.MainNextPage = ttk.Button(self.MainControlsFrame, text="Next Page", command=self.nextPageMain)
-        self.MainNextPage.pack(fill="x", expand=True, side=tkinter.LEFT)
-        self.MainControlsFrame.grid(column=2, row=0, sticky="ew")
+            self.Mainpdfviewer = PDFViewer(self.frameMain)
+            self.Mainpdfviewer.grid(column=1, row=0, rowspan=2, sticky="news")
+            self.Mainpdfviewer.addSaveSettingFunc(self.backend.saveMAINzoom)
 
-        ## 3
-        self.indexrow = IndexRow(self.frameMain)
-        self.indexrow.grid(column=3, row=0, rowspan=2, sticky="news")
-        self.indexrow.addFunc(self.backend.addToIndex) # Binds the save to the right button
+            self.textMain = readonlytext.ReadOnlyText(self.frameMain, font=('TkFixedFont bold', self.backend.appConfigManager.config["SETTINGS"]["fontSize"]))
+            self.textMain.grid(column=2, row=1, sticky="news")
+            
+            self.MainControlsFrame = ttk.Frame(self.frameMain)
+            self.MainPrevPage = ttk.Button(self.MainControlsFrame, text="Prev Page", command=self.prevPageMain)
+            self.MainPrevPage.pack(fill="x", expand=True, side=tkinter.LEFT)
+            self.MainNextPage = ttk.Button(self.MainControlsFrame, text="Next Page", command=self.nextPageMain)
+            self.MainNextPage.pack(fill="x", expand=True, side=tkinter.LEFT)
+            self.MainControlsFrame.grid(column=2, row=0, sticky="ew")
 
-        
-        self.menuPDF.add_command(label="Test Save", command=self.indexrow.save)
-        self.textMain.bind("<e>", self.addTitleToIndexRow)
-        self.textMain.bind("<q>", self.addDescToIndexRow)
-        self.textMain.bind("<a>", self.prevPageMain)
-        self.textMain.bind("<d>", self.nextPageMain)
-        self.textMain.bind("<s>", self.indexrow.save)
+            self.indexrow = IndexRow(self.frameMain)
+            self.indexrow.grid(column=3, row=0, rowspan=2, sticky="news")
+            self.indexrow.addFunc(self.backend.addToIndex) # Binds the save to the right button
 
-        ## Index Tab ##
-        self.frameIndex = ttk.Frame(self.notebook, width=400, height=280)
-        self.frameIndex.pack(fill="both", expand=True)
-        self.notebook.add(self.frameIndex, text="Index")
+            self.menuPDF.add_command(label="Test Save", command=self.indexrow.save)
+            self.textMain.bind("<e>", self.addTitleToIndexRow)
+            self.textMain.bind("<q>", self.addDescToIndexRow)
+            self.textMain.bind("<a>", self.prevPageMain)
+            self.textMain.bind("<d>", self.nextPageMain)
+            self.textMain.bind("<s>", self.indexrow.save)
 
-        self.indexText = tkinter.Text(self.frameIndex)
-        self.indexText.pack(expand=True, fill="both")
+    def openIndexTab(self):
+            self.frameIndex = ttk.Frame(self.notebook, width=400, height=280)
+            self.frameIndex.pack(fill="both", expand=True)
+            self.notebook.add(self.frameIndex, text="Index")
 
-        #self.button3 = ttk.Button(self.frameIndex, text="change Title", command=self.test)
-        #self.button3.pack()
+            self.indexText = tkinter.Text(self.frameIndex)
+            self.indexText.pack(expand=True, fill="both")
 
-        ## PDF Tab ##
-        self.framePDF = ttk.Frame(self.notebook)#, width=400, height=280)
-        self.framePDF.pack(fill="both", expand=True)
-        self.notebook.add(self.framePDF, text="PDF")
-        
-        self.PDFpdfviewer = PDFViewer(self.framePDF)
-        self.PDFpdfviewer.pack(fill="both",expand=True)
-        self.PDFpdfviewer.addSaveSettingFunc(self.backend.savePDFzoom)
-        #self.button4 = ttk.Button(self.framePDF, text="change Title", command=self.test)
-        #self.button4.pack()
+    def openPDFTab(self):
+            self.framePDF = ttk.Frame(self.notebook)#, width=400, height=280)
+            self.framePDF.pack(fill="both", expand=True)
+            self.notebook.add(self.framePDF, text="PDF")
+            
+            self.PDFpdfviewer = PDFViewer(self.framePDF)
+            self.PDFpdfviewer.pack(fill="both",expand=True)
+            self.PDFpdfviewer.addSaveSettingFunc(self.backend.savePDFzoom)
 
-        ## Search Tab ##
-        self.frameSearch = ttk.Frame(self.notebook, width=400, height=280)
-        self.frameSearch.pack(fill="both", expand=True)
-        self.notebook.add(self.frameSearch, text="Search")
-        self.button5 = ttk.Button(self.frameSearch, text="change Title", command=self.test)
-        self.button5.pack()
+    def openSearchTab(self):
+            self.frameSearch = ttk.Frame(self.notebook, width=400, height=280)
+            self.frameSearch.pack(fill="both", expand=True)
+            self.notebook.add(self.frameSearch, text="Search")
+            self.button5 = ttk.Button(self.frameSearch, text="change Title", command=self.test)
+            self.button5.pack()
 
-        ## Config Tab ##
-        self.frameConfig = ttk.Frame(self.notebook, width=400, height=280)
-        self.frameConfig.pack(fill="both", expand=True)
-        self.notebook.add(self.frameConfig, text="Config")
-        self.button6 = ttk.Button(self.frameConfig, text="change Title", command=self.test)
-        self.button6.pack()
+    def openConfigTab(self):
+            self.frameConfig = ttk.Frame(self.notebook, width=400, height=280)
+            self.frameConfig.pack(fill="both", expand=True)
+            self.notebook.add(self.frameConfig, text="Config")
+            self.button6 = ttk.Button(self.frameConfig, text="change Title", command=self.test)
+            self.button6.pack()
 
     def openTXTFile(self, event=None) -> None:
         self.logger.info("Open a Text file")
@@ -250,7 +258,7 @@ class App:
 
     def openSession(self, event=None) -> None:
         self.logger.info("Openning a Session")
-        session = filedialog.askdirectory(mustexist=True)
+        session = filedialog.askdirectory(mustexist=True, title="Select A Session Folder")
         sessionName = os.path.basename(session)
         self.backend.openSession(sessionName)
         self.root.title(f"PDF Indexer. Current Session: {self.backend.currentSession}")

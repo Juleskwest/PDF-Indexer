@@ -47,7 +47,7 @@ class SessionConfig(ConfigManager):
     
     def default(self):
         self.config["PDF"] = {"filePath": "", "password": "", "bookSetName": "", "numberOfBooks": "", "pdfsize": ""}
-        self.config["DETAILS"] = {"lastPage":"1", "lastBook":"1", "zoomMain": "1.0"}
+        self.config["DETAILS"] = {"lastPage":"1", "lastBook":"1", "zoomMain": "1.0", "zoomPDF": "1.0"}
         self.config["INDEX"] = {"filePath": ""}
         self.config["BOOKS"] = {}
         self.logger.info("Session Config Created")
