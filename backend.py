@@ -239,3 +239,26 @@ class Backend:
         self.logger.info(f"ZOOM Main to be save: {zoom}")
         self.sessionConfigManager.config["DETAILS"]["zoomMain"] = str(zoom)
         self.sessionConfigManager.save()
+
+    def checkSessionDetails(self):
+        if self.checkPDFPath and self.checkIndexPath:
+            return True
+        return False
+    
+    def checkPDFPath(self):
+        potentialPath = self.sessionConfigManager.config["PDF"]["filePath"]
+        if potentialPath != "":
+            return potentialPath
+        return False
+    
+    def checkPDFPassword(self):
+        potentialPassword = self.sessionConfigManager.config["PDF"]["password"]
+        if potentialPassword != "":
+            return potentialPassword
+        return False
+    
+    def checkIndexPath(self):
+        potentialPath = self.sessionConfigManager.config["INDEX"]["filePath"]
+        if potentialPath != "":
+            return potentialPath
+        return False
