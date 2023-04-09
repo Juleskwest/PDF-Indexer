@@ -315,18 +315,30 @@ class App:
         self.button6 = ttk.Button(self.frameConfig, text="change Title", command=self.test)
         self.button6.pack()
 
+    def closeTab(self, tabName):
+        total = self.notebook.index("end")
+        for i in range(0, total):
+            id = self.notebook.index(i)
+            name = self.notebook.tab(id, "text")
+            if name == tabName:
+                self.notebook.forget(id)
+                self.logger.info(f"{tabName} Tab closed")
+                return
+        self.logger.warning("No Tab matched to close")
+    
+    def checkTabOpen(self, tabName):
+        total = self.notebook.index("end")
+        for i in range(0, total):
+            id = self.notebook.index(i)
+            name = self.notebook.tab(id, "text")
+            if name == tabName:
+                return True
+        return False
+
     def openValidSession(self):
-        # Close the Session tab if open then open main etc
-        # Check if vaild 1st then run
         if self.backend.checkSessionDetails():
-            total = self.notebook.index("end")
-            for i in range(0, total):
-                id = self.notebook.index(i)
-                name = self.notebook.tab(id, "text")
-                print(name)
-                if name == "Session":
-                    self.notebook.forget(id)
-            #self.notebook.select(1)
+            if self.checkTabOpen("Session"):
+                self.closeTab("Session")
             self.openMainTab()
             self.openPDFTab()
 
@@ -354,6 +366,8 @@ class App:
             self.PDFPathStrVar.set(self.backend.checkPDFPath())
             self.PDFPasswordStrVar.set(self.backend.checkPDFPassword())
             self.IndexPathStrVar.set(self.backend.checkIndexPath())
+            if self.checkTabOpen("Welcome"):
+                self.closeTab("Welcome")
             self.openSessionTab()
 
     def closeSession(self, event=None) -> None:
@@ -371,6 +385,8 @@ class App:
             self.PDFPathStrVar.set(self.backend.checkPDFPath())
             self.PDFPasswordStrVar.set(self.backend.checkPDFPassword())
             self.IndexPathStrVar.set(self.backend.checkIndexPath())
+            if self.checkTabOpen("Welcome"):
+                self.closeTab("Welcome")
             self.openSessionTab()
 
     def addPDF(self, event=None) -> None:
