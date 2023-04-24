@@ -1,6 +1,11 @@
 # PDF-Indexer
 
+## Description
+
+This is a python tkinter tool to index PDF documents. You can highlight text adding it to the Title or the Descripton and it will auto fill in the page and book number.
+
 ## Install 
+
 There are some issues with installing dependencies on Python 3.11
 
 The recommended way to run is with the exe in the main.zip in the pre release for now.
