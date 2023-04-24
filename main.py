@@ -8,6 +8,7 @@ import backend
 from pdfviewer import PDFViewer
 from indexrow import IndexRow
 from logger import Logger
+from update import UpdateManager
 
 class App:
     def __init__(self) -> None:
@@ -21,6 +22,7 @@ class App:
 
         self.resetVariables()
         self.backend = backend.Backend()
+        self.updateManager = UpdateManager()
 
         ## Style Seclection
         self.style = ttk.Style()
@@ -146,7 +148,11 @@ class App:
         # Help
         self.menuHelp = tkinter.Menu(self.menu, title="Help", tearoff=False)
         self.menu.add_cascade(label="Help", menu=self.menuHelp)
-        self.menuHelp.add_command(label="Test", command=self.test)
+        # Will add a update check button
+        self.menuHelp.add_command(label="Latest Version")
+        self.menuHelp.add_command(label="Check for update", command=self.checkVersion)
+        self.checkVersion()
+        self.menuHelp.add_command(label="Update", command=self.updateManager.update)
 
         ####### Notebook ############
         self.notebook = ttk.Notebook(self.root)
@@ -163,6 +169,16 @@ class App:
             #self.openPDFTab()
             #self.openSearchTab()
             #self.openConfigTab()
+
+    def checkVersion(self, event=None):
+        self.updateManager.checkRemoteVersion()
+        self.updateManager.checkLocalVersion()
+        self.updateManager.checkUpdateAvaliable()
+        if self.updateManager.newVersionAvaliable:
+            self.menuHelp.entryconfigure(0, label="Update Avaliable!")
+        else:
+            self.menuHelp.entryconfigure(0, label="Latest Version")
+
 
     def openWelcomeTab(self):
         self.frameWelcome = ttk.Frame(self.notebook, width=800, height=400)

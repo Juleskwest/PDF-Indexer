@@ -10,8 +10,9 @@ class UpdateManager():
         self.files = {}
         self.logger = Logger("Updater")
 
-        self.versionURL = "https://raw.githubusercontent.com/Juleskwest/PDF-Indexer/dev/version.txt"
-        self.githubURL = "https://api.github.com/repos/Juleskwest/PDF-Indexer/git/trees/dev?recursive=1"
+        self.branch = "dev"
+        self.versionURL = f"https://raw.githubusercontent.com/Juleskwest/PDF-Indexer/{self.branch}/version.txt"
+        self.githubURL = f"https://api.github.com/repos/Juleskwest/PDF-Indexer/git/trees/{self.branch}?recursive=1"
 
     def checkLocalVersion(self):
         with open("version.txt", "r") as file:
