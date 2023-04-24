@@ -39,6 +39,14 @@ class App:
             #self.PDFpdfviewer.zoomlevel = self.backend.getPDFzoom()
             #self.Mainpdfviewer.zoomlevel = self.backend.getMAINzoom()
             pass
+        
+        if self.backend.currentSession == "":
+            self.openWelcomeTab()
+        else:
+            self.openSessionTab()
+            #self.openMainTab()
+            #self.openPDFTab()
+            #self.openIndex()
 
     def resetVariables(self):
         self.openTabs = {}
@@ -159,16 +167,6 @@ class App:
         self.notebook.bind('<<NotebookTabChanged>>', self.notebookTABChange)
         self.notebook.pack(fill="both", expand=True)
 
-        if self.backend.currentSession == "":
-            self.openWelcomeTab()
-        else:
-            self.openSessionTab()
-
-            #self.openMainTab()
-            #self.openIndex()
-            #self.openPDFTab()
-            #self.openSearchTab()
-            #self.openConfigTab()
 
     def checkVersion(self, event=None):
         self.updateManager.checkRemoteVersion()
@@ -256,7 +254,7 @@ class App:
             self.IndexPathStrVar.set(" ...")
         self.sessionTabIndexPathValLabel = ttk.Label(self.frameSession, textvariable=self.IndexPathStrVar, relief=tkinter.GROOVE, width=20, padding=2)
         self.sessionTabIndexPathValLabel.grid(column=2,row=6, sticky="ew")
-        self.sessionTabIndexButton = ttk.Button(self.frameSession, text="Add") ######################## Need to add Command
+        self.sessionTabIndexButton = ttk.Button(self.frameSession, text="Add", command=self.newIndex)
         self.sessionTabIndexButton.grid(column=3,row=6, sticky="ew")
 
         ttk.Label(self.frameSession, text="").grid(column=1,row=7, sticky="ew", columnspan=3)
@@ -357,6 +355,7 @@ class App:
                 self.closeTab("Session")
             self.openMainTab()
             self.openPDFTab()
+            self.openIndexTab()
 
     def openTXTFile(self, event=None) -> None:
         self.logger.info("Open a Text file")
@@ -512,7 +511,8 @@ class App:
         self.indexrow.addDesc(tmp)
 
     def newIndex(self, event=None):
-        self.backend.newIndex()
+        indexName = simpledialog.askstring(title="Index Name", prompt="Title for index:")
+        self.backend.newIndex(indexName)
         pass # Create a dialog to make a new index
     def saveIndex(self, event=None):
         self.backend.saveIndex()

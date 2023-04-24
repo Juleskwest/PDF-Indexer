@@ -15,14 +15,14 @@ class Backend:
         self.openLastSession()
         
     def resetVariables(self):
-        self.pdf:fitz.Document
+        self.pdf:fitz.Document = None
         self.isPDFLoaded:bool = False
         self.offsets = {}
         self.currentSession:str = ""
         self.index = []
         self.currentPage = None
         self.currentBook = None
-        self.sessionConfigManager:configMan.SessionConfig
+        self.sessionConfigManager:configMan.SessionConfig = None
 
     def __del__(self) -> None:
         self.closeSession()
@@ -42,11 +42,14 @@ class Backend:
             sessionName += "-new"
         if self.currentSession != "":
             self.closeSession()
-        self.resetVariables()
         os.mkdir(sessionName)
-        self.openSession(sessionName)
+        #self.openSession(sessionName) # Might need to do what we want here not try open etc
+        configFilePath = f"{sessionName}/index.ini"
+        self.sessionConfigManager = configMan.SessionConfig(configFilePath)
+        self.currentSession = sessionName
         self.sessionConfigManager.config["DETAILS"]["lastPage"] = str(1)
         self.sessionConfigManager.config["DETAILS"]["lastBook"] = str(1)
+        #self.newIndex()
 
     def openSession(self, sessionName) -> None:
         self.resetVariables()
@@ -54,12 +57,13 @@ class Backend:
             configFilePath = f"{sessionName}/index.ini"
             self.sessionConfigManager = configMan.SessionConfig(configFilePath)
             self.currentSession = sessionName
-            self.currentPage = int(self.sessionConfigManager.config["DETAILS"]["lastPage"])
-            self.currentBook = int(self.sessionConfigManager.config["DETAILS"]["lastBook"])
-            self.openPDF()
-            self.loadIndex()
-            self.logger.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
-            self.logger.info(f"Session {sessionName} Openned")
+            if self.checkSessionDetails():
+                self.currentPage = int(self.sessionConfigManager.config["DETAILS"]["lastPage"])
+                self.currentBook = int(self.sessionConfigManager.config["DETAILS"]["lastBook"])
+                self.openPDF()
+                self.loadIndex()
+                self.logger.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
+                self.logger.info(f"Session {sessionName} Openned")
         else:
             self.logger.warning(f"Session {sessionName} Does not exist")
             self.appConfigManager.config["APP"]["lastSession"] = ""
@@ -73,7 +77,7 @@ class Backend:
                 self.openSession(lastSession)
 
     def closeSession(self) -> None:
-        if self.currentSession != "":
+        if self.currentSession != "" and self.checkSessionDetails():
             self.logger.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
             self.sessionConfigManager.config["DETAILS"]["lastPage"] = str(self.currentPage)
             self.sessionConfigManager.config["DETAILS"]["lastBook"] = str(self.currentBook)
@@ -158,7 +162,10 @@ class Backend:
             self.logger.info(f"{csvpath} openned")
         else:
             self.logger.info(f"{csvpath} Does not exist making now")
-            self.newIndex(csvpath)
+            if csvpath != "":
+                self.newIndex(csvpath)
+            else:
+                self.newIndex()
     
     def saveIndex(self) -> None:
         csvpath = self.sessionConfigManager.config["INDEX"]["filePath"]
@@ -241,13 +248,15 @@ class Backend:
         self.sessionConfigManager.save()
 
     def checkSessionDetails(self):
-        if self.checkPDFPath and self.checkIndexPath:
+        if self.checkPDFPath() and self.checkIndexPath():
+            print("True The details etc")
             return True
         return False
     
     def checkPDFPath(self):
         potentialPath = self.sessionConfigManager.config["PDF"]["filePath"]
-        if potentialPath != "":
+        if potentialPath != "" and potentialPath != None:
+            print(f"PDF path: {potentialPath}")
             return potentialPath
         return False
     
@@ -259,6 +268,7 @@ class Backend:
     
     def checkIndexPath(self):
         potentialPath = self.sessionConfigManager.config["INDEX"]["filePath"]
-        if potentialPath != "":
+        if potentialPath != "" and potentialPath != None:
+            print(f"Index path: {potentialPath}")
             return potentialPath
         return False
