@@ -10,9 +10,11 @@ The recommended way to run is with the exe in the main.zip in the pre release fo
 With in the main tab there are the following controls:
 
 A - Back a page
+
 D - Next a page
 
 E - Add highlighted text to the Title of the Serial
+
 Q - Add highlighted text to the Description the Serial
 
 S - Save that Serial to Index
