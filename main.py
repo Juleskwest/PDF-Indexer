@@ -12,11 +12,12 @@ from update import UpdateManager
 
 class App:
     def __init__(self) -> None:
-        self.logger = Logger("main")
-        self.logger.info("App Started")
+        self.log = Logger("App")
+        self.log.stack()
+        self.log.info("App Started")
 
         self.root = tkinter.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.__del__)
+        #self.root.protocol("WM_DELETE_WINDOW", self.__del__) # Might not be needed
         self.root.bind("<Configure>", self.resize)
         self.root.minsize(800,400)
 
@@ -57,27 +58,31 @@ class App:
         self.PDFPasswordStrVar = tkinter.StringVar(self.root, "")
         self.IndexPathStrVar = tkinter.StringVar(self.root, "")
 
-    def __del__(self) -> None:    
+    def __del__(self) -> None:
+        self.log.stack()    
         if self.backend.currentSession != "":
             self.closeSession()
         try:
             self.root.destroy()
         except tkinter.TclError as err:
             if err.__str__() != "can't invoke \"destroy\" command: application has been destroyed":
-                self.logger.exception("Tcl Error on exit")
+                self.log.exception("Tcl Error on exit")
         finally:
-            self.logger.info("Exited from __del__")
+            self.log.info("Exited from __del__")
 
     def run(self) -> None:
-        self.logger.info("Mainloop Running")
+        self.log.stack()
+        self.log.info("Mainloop Running")
         self.root.mainloop()
 
     def exit(self, event=None):
+        self.log.stack()
         self.root.quit()
-        self.logger.info("Exited from exit()")
+        self.log.info("Exited from exit()")
 
     def changestyle(self) -> None:
-        self.logger.info("Change Style")
+        self.log.stack()
+        self.log.info("Change Style")
         ## Will need to clean the colours up
         MainBGColor = "#2d2d2d"
         subBGColor = "#252526"
@@ -110,7 +115,8 @@ class App:
                  )
 
     def createWidgets(self) -> None:
-        self.logger.info("Create Widgets")
+        self.log.stack()
+        self.log.info("Create Widgets")
         ####### Menu Bar ############
         self.menu = tkinter.Menu(self.root)
         self.root.config(menu=self.menu)
@@ -169,6 +175,7 @@ class App:
 
 
     def checkVersion(self, event=None):
+        self.log.stack()
         self.updateManager.checkRemoteVersion()
         self.updateManager.checkLocalVersion()
         self.updateManager.checkUpdateAvaliable()
@@ -179,6 +186,7 @@ class App:
 
 
     def openWelcomeTab(self):
+        self.log.stack()
         self.frameWelcome = ttk.Frame(self.notebook, width=800, height=400)
         self.frameWelcome.pack(fill="both", expand=True)
         self.notebook.add(self.frameWelcome, text="Welcome")
@@ -196,6 +204,7 @@ class App:
         self.welcomeButtonOpenSession.grid(column=1,row=2,sticky="ew")
 
     def openSessionTab(self):
+        self.log.stack()
         self.frameSession = ttk.Frame(self.notebook)
         self.frameSession.pack(fill="both", expand=True)
         self.notebook.add(self.frameSession, text="Session")
@@ -263,6 +272,7 @@ class App:
         self.sessionTabFinishButton.grid(column=2,row=8, sticky="ew")
 
     def openMainTab(self):
+        self.log.stack()
         self.frameMain = ttk.Frame(self.notebook, width=400, height=280)
         self.frameMain.pack(fill="both", expand=True)
         self.notebook.add(self.frameMain, text="Main")
@@ -299,6 +309,7 @@ class App:
         self.textMain.bind("<s>", self.indexrow.save)
 
     def openIndexTab(self):
+        self.log.stack()
         self.frameIndex = ttk.Frame(self.notebook, width=400, height=280)
         self.frameIndex.pack(fill="both", expand=True)
         self.notebook.add(self.frameIndex, text="Index")
@@ -307,6 +318,7 @@ class App:
         self.indexText.pack(expand=True, fill="both")
 
     def openPDFTab(self):
+        self.log.stack()
         self.framePDF = ttk.Frame(self.notebook)#, width=400, height=280)
         self.framePDF.pack(fill="both", expand=True)
         self.notebook.add(self.framePDF, text="PDF")
@@ -316,6 +328,7 @@ class App:
         self.PDFpdfviewer.addSaveSettingFunc(self.backend.savePDFzoom)
 
     def openSearchTab(self):
+        self.log.stack()
         self.frameSearch = ttk.Frame(self.notebook, width=400, height=280)
         self.frameSearch.pack(fill="both", expand=True)
         self.notebook.add(self.frameSearch, text="Search")
@@ -323,6 +336,7 @@ class App:
         self.button5.pack()
 
     def openConfigTab(self):
+        self.log.stack()
         self.frameConfig = ttk.Frame(self.notebook, width=400, height=280)
         self.frameConfig.pack(fill="both", expand=True)
         self.notebook.add(self.frameConfig, text="Config")
@@ -330,17 +344,19 @@ class App:
         self.button6.pack()
 
     def closeTab(self, tabName):
+        self.log.stack()
         total = self.notebook.index("end")
         for i in range(0, total):
             id = self.notebook.index(i)
             name = self.notebook.tab(id, "text")
             if name == tabName:
                 self.notebook.forget(id)
-                self.logger.info(f"{tabName} Tab closed")
+                self.log.info(f"{tabName} Tab closed")
                 return
-        self.logger.warning("No Tab matched to close")
+        self.log.warning("No Tab matched to close")
     
     def checkTabOpen(self, tabName):
+        self.log.stack()
         total = self.notebook.index("end")
         for i in range(0, total):
             id = self.notebook.index(i)
@@ -350,6 +366,7 @@ class App:
         return False
 
     def openValidSession(self):
+        self.log.stack()
         if self.backend.checkSessionDetails():
             if self.checkTabOpen("Session"):
                 self.closeTab("Session")
@@ -358,7 +375,8 @@ class App:
             self.openIndexTab()
 
     def openTXTFile(self, event=None) -> None:
-        self.logger.info("Open a Text file")
+        self.log.stack()
+        self.log.info("Open a Text file")
         with filedialog.askopenfile(mode="r") as file:
             fileName = os.path.basename(file.name)
             self.openTabs[fileName] = [ttk.Frame(self.notebook, width=400, height=280), None, None]
@@ -372,7 +390,8 @@ class App:
             self.openTabs[fileName][1]["yscrollcommand"] = self.openTabs[fileName][2].set
 
     def openSession(self, event=None) -> None:
-        self.logger.info("Openning a Session")
+        self.log.stack()
+        self.log.info("Openning a Session")
         session = filedialog.askdirectory(mustexist=True, title="Select A Session Folder")
         if session != "":
             sessionName = os.path.basename(session)
@@ -386,12 +405,14 @@ class App:
             self.openSessionTab()
 
     def closeSession(self, event=None) -> None:
-        self.logger.info("Closing a Session")
+        self.log.stack()
+        self.log.info("Closing a Session")
         self.backend.closeSession()
         self.root.title("PDF Indexer.")
 
     def newSession(self, event=None) -> None: ############# Look at this then calling open session or a 3rd function both call to reduce duplicate code
-        self.logger.info("New Session")
+        self.log.stack()
+        self.log.info("New Session")
         sessionName = simpledialog.askstring(title="New Session", prompt="New Session Name:")
         if sessionName != None:
             self.backend.closeSession()
@@ -405,44 +426,50 @@ class App:
             self.openSessionTab()
 
     def addPDF(self, event=None) -> None:
-        self.logger.info("Add a PDF file to session")
+        self.log.stack()
+        self.log.info("Add a PDF file to session")
         filePath:str = filedialog.askopenfilename()
         self.backend.addPDFPath(filePath)
         self.PDFPathStrVar.set(self.backend.checkPDFPath())
         ## Add info the PDF TAB here
 
     def addPDFPassword(self, event=None) -> None:
-        self.logger.info("Ask for PDF Password Session")
+        self.log.stack()
+        self.log.info("Ask for PDF Password Session")
         password = simpledialog.askstring(title="PDF Password", prompt="PDF Password:")
         self.backend.addPDFPassword(password)
         self.PDFPasswordStrVar.set(self.backend.checkPDFPassword())
 
     def openPDF(self, event=None) -> None:
+        self.log.stack()
         if self.backend.currentSession == "":
-            self.logger.error("No Open Session can't open PDF")
+            self.log.error("No Open Session can't open PDF")
             return
         elif self.backend.sessionConfigManager.config["PDF"]["filepath"] == "":
-            self.logger.error("No PDF to open")
+            self.log.error("No PDF to open")
             return
         self.backend.openPDF()
 
     def proccessPDF(self, event=None) -> None:
+        self.log.stack()
         if self.backend.currentSession == "":
-            self.logger.error("No Open Session can't open PDF")
+            self.log.error("No Open Session can't open PDF")
             return
         elif self.backend.sessionConfigManager.config["PDF"]["filepath"] == "":
             self.openPDF()
-        self.logger.info("Proccess PDF")
+        self.log.info("Proccess PDF")
         self.backend.prepPDF()
 
     def updateMain(self, event=None) -> None:
+        self.log.stack()
         self.textMain.delete("1.0", tkinter.END)
         self.textMain.insert(tkinter.END, self.backend.getPageText())
         self.Mainpdfviewer.addPixmap(self.backend.getPagePixmap())
-        self.logger.info("Update Main Tab")
+        self.log.info("Update Main Tab")
 
     def updateIndex(self, event=None):
-        self.logger.info("Changed to Index")
+        self.log.stack()
+        self.log.info("Changed to Index")
         self.indexText.delete(0.0, tkinter.END)
         tmp = ""
         for line in self.backend.index:
@@ -450,6 +477,7 @@ class App:
         self.indexText.insert(tkinter.END, tmp)
     
     def notebookTABChange(self, event=None) -> None:
+        self.log.stack()
         currentTab = self.getCurrentTab()
         match currentTab:
             case "Welcome":
@@ -459,9 +487,10 @@ class App:
             case "Index":
                 self.updateIndex()
             case _:
-                self.logger.info(f"Switched to {currentTab}")
+                self.log.info(f"Switched to {currentTab}")
 
     def resize(self, event=None) -> None:
+        self.log.stack()
         if(event.widget == self.root and
            (self.width != event.width or self.height != event.height)):
             self.width, self.height = event.width, event.height
@@ -473,52 +502,64 @@ class App:
                     #self.updateMainImage()
                     pass
                 case _:
-                    self.logger.info(f"Resized")
+                    self.log.info(f"Resized")
 
     def getCurrentTab(self) -> str:
+        self.log.stack()
         return self.notebook.tab(self.notebook.select(), "text")
 
     def pdfSetup(self, event=None):
+        self.log.stack()
         self.openPDF()
         if self.mainPixmap == None:
             self.mainPixmap = self.backend.getPagePixmap()
         self.PDFpdfviewer.addPixmap(self.mainPixmap)
 
     def nextPageMain(self, event=None):
+        self.log.stack()
         self.backend.nextPage()
         self.updateMain()
 
     def prevPageMain(self, event=None):
+        self.log.stack()
         self.backend.prevPage()
         self.updateMain()
 
     def test(self, event=None):
-        self.logger.info("Test Run")
+        self.log.stack()
+        self.log.info("Test Run")
         self.indexrow.save()
     
     def testAdd(self, event=None):
+        self.log.stack()
         self.indexrow.addInfo(1,1,"Testing")
         self.indexrow.addDesc("Test Desc")
 
     def addTitleToIndexRow(self, event=None):
+        self.log.stack()
         tmp = self.textMain.selection_get()
         self.indexrow.addBook(self.backend.currentBook)
         self.indexrow.addPage(self.backend.currentPage)
         self.indexrow.addTitle(tmp)
 
     def addDescToIndexRow(self, event=None):
+        self.log.stack()
         tmp = self.textMain.selection_get()
         self.indexrow.addDesc(tmp)
 
     def newIndex(self, event=None):
+        self.log.stack()
         indexName = simpledialog.askstring(title="Index Name", prompt="Title for index:")
         self.backend.newIndex(indexName)
         pass # Create a dialog to make a new index
     def saveIndex(self, event=None):
+        self.log.stack()
         self.backend.saveIndex()
     def openIndex(self, event=None):
+        self.log.stack()
         pass # Create a dialog to open a index
     def closeIndex(self, event=None):
+        self.log.stack()
         pass # close the current index
     
 if __name__ == "__main__":

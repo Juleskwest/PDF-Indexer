@@ -1,8 +1,10 @@
 import logging
 import sys
+import inspect
 
 class Logger:
     def __init__(self, name, logfile="file.log") -> None:
+        self.name = name
         self.logfile = logfile
         self.logger = logging.getLogger(f"{name:10}")
 
@@ -38,3 +40,25 @@ class Logger:
             
     def exception(self, message):
         self.logger.exception(message)
+
+    def stack(self):
+        ## Get function that called this function
+        stack:list[inspect.FrameInfo]
+        try:
+            stack = inspect.stack()
+            try:
+                callingClass = stack[2][0].f_locals["self"].__class__.__name__
+            except KeyError:
+                callingClass = ""
+            except IndexError:
+                callingClass = ""
+            try:
+                callingMethod = stack[2][0].f_code.co_name
+            except IndexError:
+                callingMethod = ""
+            MethodName = stack[1][0].f_code.co_name
+            self.logger.debug(f"{self.name}.{MethodName}() was called from {callingClass}.{callingMethod}()")
+        except Exception as error:
+            self.logger.exception(error)
+        finally:
+            pass
