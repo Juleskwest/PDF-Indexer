@@ -53,6 +53,7 @@ class SessionConfig(ConfigManager):
     
     def default(self):
         self.log.stack()
+        self.config["SESSION"] = {"Configured": "False"}
         self.config["PDF"] = {"filePath": "", "password": "", "bookSetName": "", "numberOfBooks": "", "pdfsize": ""}
         self.config["DETAILS"] = {"lastPage":"1", "lastBook":"1", "zoomMain": "1.0", "zoomPDF": "1.0"}
         self.config["INDEX"] = {"filePath": ""}
