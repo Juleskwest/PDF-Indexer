@@ -1,6 +1,6 @@
 import tkinter
 from tkinter import ttk
-from logger import Logger
+from utils.logger import Logger
 
 
 class IndexRow(ttk.Frame):

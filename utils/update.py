@@ -1,6 +1,6 @@
 import requests
 import base64
-from logger import Logger
+from utils.logger import Logger
 
 class UpdateManager():
     def __init__(self) -> None:

@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import ttk
 from PIL import Image, ImageTk
-from logger import Logger
+from utils.logger import Logger
 
 class PDFViewer(ttk.Frame):
     def __init__(self, master, **kw):

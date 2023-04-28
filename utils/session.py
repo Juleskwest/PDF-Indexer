@@ -1,7 +1,7 @@
 # Session Manager 
-import logger
+import utils.logger as logger
 import os
-from configMan import SessionConfig
+from utils.configMan import SessionConfig
 
 class SessionManager:
     def __init__(self) -> None:

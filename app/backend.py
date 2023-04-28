@@ -1,8 +1,8 @@
 import fitz
-import configMan
+import utils.configMan as configMan
 import os
 import csv
-from logger import Logger
+from utils.logger import Logger
 
 class Backend:
     def __init__(self) -> None:

@@ -1,6 +1,6 @@
 import configparser
 import os
-from logger import Logger
+from utils.logger import Logger
 
 class Section:
     def __init__(self, section:str, parent, values:dict) -> None:
@@ -24,7 +24,7 @@ class ConfigMan:
         self.log = Logger(__name__)
         self.log.calledBy()
 
-        self.filepath = filepath
+        self.filepath = f"config/{filepath}"
         self.sections:list = []
         self.configParser:configparser.RawConfigParser
         self.reset()
@@ -60,12 +60,14 @@ class ConfigMan:
     def save(self) -> None:
         self.log.calledBy()
         try:
+            if not os.path.exists("config"):
+                os.mkdir("config")
             with open(self.filepath, "w") as configfile:
                 self.configParser.write(configfile)
                 self.log.info(f"Config file: {self.filepath} saved!")
-        except:
+        except Exception as error:
             self.log.error(f"Config file: {self.filepath} not saved!")
-            self.log.exception()
+            self.log.exception(error)
     
     def addToClass(self) -> None:
         self.log.calledBy()

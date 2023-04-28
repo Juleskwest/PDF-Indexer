@@ -1,6 +1,6 @@
-from gui import GUI
-from logger import Logger
-from configMan2 import AppConfigMan
+from app.gui import GUI
+from utils.logger import Logger
+from utils.configMan2 import AppConfigMan
 
 class App:
     def __init__(self) -> None:
@@ -10,7 +10,7 @@ class App:
         self.config = AppConfigMan("appConfig.ini")
         self.gui = GUI(self, self.config.Gui)
 
-        self.sessionMan 
+        self.sessionMan = None
         
     def run(self):
         self.log.calledBy()

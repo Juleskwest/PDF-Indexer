@@ -1,6 +1,8 @@
 .vscode/
 __pycache__/
 test/
+config/
+logs/
 config.ini
 todo.txt
 *.log

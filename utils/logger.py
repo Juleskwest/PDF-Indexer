@@ -1,12 +1,15 @@
 import logging
 import sys
 import inspect
+import os
 
 class Logger:
     def __init__(self, name, logfile="file.log") -> None:
         self.name = name
-        self.logfile = logfile
-        self.logger = logging.getLogger(f"{name:10}")
+        self.logfile = f"logs/{logfile}"
+        self.logger = logging.getLogger(f"{name:20}")
+        if not os.path.exists("logs"):
+            os.mkdir("logs")
 
         # Handlers
         self.c_handler = logging.StreamHandler(stream = sys.stdout)

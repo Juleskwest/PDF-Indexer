@@ -1,6 +1,6 @@
 import configparser
 import os
-from logger import Logger
+from utils.logger import Logger
 
 class ConfigManager:
     def __init__(self, configfilePath) -> None:

@@ -9,9 +9,9 @@ from widgets.welcomeTab import WelcomeTab
 from widgets.indexrow import IndexRow
 
 import os
-import backend
-from logger import Logger
-from update import UpdateManager
+import app.backend as backend
+from utils.logger import Logger
+from utils.update import UpdateManager
 
 class GUI:
     def __init__(self, app, config) -> None:
@@ -481,9 +481,9 @@ class GUI:
                 self.log.info(f"Switched to {currentTab}")
 
     def resize(self, event=None) -> None:
-        self.log.calledBy()
         if(event.widget == self.root and
            (self.width != event.width or self.height != event.height)):
+            self.log.calledBy()
             self.width, self.height = event.width, event.height
             currentTab = self.getCurrentTab()
             match currentTab:

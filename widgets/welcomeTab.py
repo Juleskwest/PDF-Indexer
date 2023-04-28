@@ -1,5 +1,5 @@
 from tkinter import ttk
-from logger import Logger
+from utils.logger import Logger
 
 class WelcomeTab(ttk.Frame):
     def __init__(self, master, newSessionFunction, openSessionFunction,  **kw):
