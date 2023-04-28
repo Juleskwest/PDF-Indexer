@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 from logger import Logger
 
 class PDFViewer(ttk.Frame):
-    def __init__(self, master=None, **kw):
+    def __init__(self, master, **kw):
         self.pixmap = kw.pop('pixmap', None)
         self.image = kw.pop('image', None)
         self.width = kw.pop('width', None)
