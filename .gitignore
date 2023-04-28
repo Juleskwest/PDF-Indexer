@@ -5,3 +5,4 @@ config.ini
 todo.txt
 *.log
 output/
+test.py

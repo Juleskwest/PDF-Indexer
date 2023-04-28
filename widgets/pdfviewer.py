@@ -12,7 +12,7 @@ class PDFViewer(ttk.Frame):
         self.zoomlevel = kw.pop('zoom', None)
         super(PDFViewer, self).__init__(master=master, **kw)
         self.log = Logger(__name__)
-        self.log.stack()
+        self.log.calledBy()
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=0)
         self.columnconfigure(2, weight=0)
@@ -65,15 +65,15 @@ class PDFViewer(ttk.Frame):
         self.zoomlevel = 1.0
 
     def addSaveSettingFunc(self, func):
-        self.log.stack()
+        self.log.calledBy()
         self.func = func
 
     def saveSettings(self):
-        self.log.stack()
+        self.log.calledBy()
         self.func(self.zoomlevel)
 
     def proccessPixmap(self):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(self.zoomlevel)
         mode = "RGBA" if self.pixmap.alpha else "RGB"
         img = Image.frombytes(mode, [self.pixmap.width, self.pixmap.height], self.pixmap.samples)
@@ -84,31 +84,31 @@ class PDFViewer(ttk.Frame):
         self.image = ImageTk.PhotoImage(resizedImage)
 
     def _bindMouseWheel(self, event):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info("Bound")
         self.bind_all("<MouseWheel>", self._onMouseWheelVert)
         self.bind_all("<Shift-MouseWheel>", self._onMouseWheelHori)
         self.bind_all("<Control-MouseWheel>", self._onMouseWheelZoom)
     
     def _unbindMouseWheel(self, event):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info("unBound")
         self.unbind_all("<MouseWheel>")
         self.unbind_all("<Shift-MouseWheel>")
         self.unbind_all("<Control-MouseWheel>")
     
     def _onMouseWheelVert(self, event=None):
-        self.log.stack()
+        self.log.calledBy()
         val = -1*(event.delta/120)
         self.pdfCanvas.yview_scroll(int(val), "units")
     
     def _onMouseWheelHori(self, event=None):
-        self.log.stack()
+        self.log.calledBy()
         val = -1*(event.delta/120)
         self.pdfCanvas.xview_scroll(int(val), "units")
 
     def _onMouseWheelZoom(self, event=None):
-        self.log.stack()
+        self.log.calledBy()
         val = -1*(event.delta/120)
         if val > 0:
             self.zoomIn()
@@ -116,22 +116,22 @@ class PDFViewer(ttk.Frame):
             self.zoomOut()
 
     def test(self):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info("from pdf viewer class")
 
     def addImage(self, image):
-        self.log.stack()
+        self.log.calledBy()
         self.image = ImageTk.PhotoImage(image)
         self.update()
         
     def addPixmap(self, pixmap):
-        self.log.stack()
+        self.log.calledBy()
         self.pixmap = pixmap
         self.proccessPixmap()
         self.update()
     
     def update(self, width=None, height=None):
-        self.log.stack()
+        self.log.calledBy()
         self.pdfCanvas.delete("all")
         if width == None and height == None:
             width = self.pdfCanvas.winfo_width()
@@ -143,20 +143,20 @@ class PDFViewer(ttk.Frame):
         self.saveSettings()
     
     def resize(self, event=None):
-        self.log.stack()
+        self.log.calledBy()
         if(event.widget == self and (self.rewidth != event.width or self.reheight != event.height)):
             self.log.info(f'T - INFO  - Canvas {event.widget}: {event.height}, {event.width}')
             self.rewidth, self.reheight = event.width, event.height
             self.update(event.width, event.height)
         
     def zoomIn(self, event=None):
-        self.log.stack()
+        self.log.calledBy()
         self.zoomlevel += 0.1
         self.proccessPixmap()
         self.update()
 
     def zoomOut(self, event=None):
-        self.log.stack()
+        self.log.calledBy()
         self.zoomlevel -= 0.1
         self.proccessPixmap()
         self.update()

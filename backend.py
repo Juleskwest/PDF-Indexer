@@ -7,7 +7,7 @@ from logger import Logger
 class Backend:
     def __init__(self) -> None:
         self.log = Logger(__name__)
-        self.log.stack()
+        self.log.calledBy()
         self.log.info("Starting backend")
 
         self.resetVariables()
@@ -17,7 +17,7 @@ class Backend:
         self.openLastSession()
         
     def resetVariables(self):
-        self.log.stack()
+        self.log.calledBy()
         self.pdf:fitz.Document = None
         self.isPDFLoaded:bool = False
         self.offsets = {}
@@ -28,7 +28,7 @@ class Backend:
         self.sessionConfigManager:configMan.SessionConfig = None
 
     def __del__(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         self.closeSession()
         try:
             self.closePDF()
@@ -40,7 +40,7 @@ class Backend:
         self.log.info("Backend Exited")
     
     def newSession(self, sessionName) -> None:
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(f"Creating Session {sessionName}")
         if os.path.exists(sessionName): ## This will only work once then will error need try except eventually
             self.log.info("Session already exists adding -new")
@@ -57,7 +57,7 @@ class Backend:
         #self.newIndex()
 
     def openSession(self, sessionName) -> None:
-        self.log.stack()
+        self.log.calledBy()
         self.resetVariables()
         if os.path.exists(sessionName):
             configFilePath = f"{sessionName}/index.ini"
@@ -77,14 +77,14 @@ class Backend:
             self.currentSession = ""
 
     def openLastSession(self):
-        self.log.stack()
+        self.log.calledBy()
         if self.currentSession == "":
             lastSession = self.appConfigManager.config["APP"]["lastSession"]
             if lastSession != "":
                 self.openSession(lastSession)
 
     def closeSession(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         if self.currentSession != "" and self.checkSessionDetails():
             self.log.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
             self.sessionConfigManager.config["DETAILS"]["lastPage"] = str(self.currentPage)
@@ -97,19 +97,19 @@ class Backend:
             self.resetVariables()
     
     def addPDFPath(self, path) -> None:
-        self.log.stack()
+        self.log.calledBy()
         self.sessionConfigManager.config["PDF"]["filePath"] = path
         self.sessionConfigManager.save()
         self.log.info("PDF path added to session")
 
     def addPDFPassword(self, password) -> None:
-        self.log.stack()
+        self.log.calledBy()
         self.sessionConfigManager.config["PDF"]["password"] = password
         self.sessionConfigManager.save()
         self.log.info("PDF password added to session")
 
     def openPDF(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         self.pdf = fitz.Document(self.sessionConfigManager.config["PDF"]["filePath"])
         self.log.info( f"Pasword to use: {self.sessionConfigManager.config['PDF']['password']} ")
         self.pdf.authenticate(self.sessionConfigManager.config["PDF"]["password"])
@@ -117,14 +117,14 @@ class Backend:
         self.log.info("PDF Opened")
 
     def closePDF(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         if self.isPDFLoaded:
             self.pdf.close()
             self.isPDFLoaded = False
             self.log.info("PDF Closed")
     
     def prepPDF(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         if self.isPDFLoaded:
             self.log.info("Processing PDF")
             bookslist = []
@@ -149,7 +149,7 @@ class Backend:
             self.log.info("Need to open a PDF 1st")
     
     def newIndex(self, indexName=None) -> None:
-        self.log.stack()
+        self.log.calledBy()
         if indexName == None:
             indexName = self.sessionConfigManager.config["PDF"]["bookSetName"]
         if ".csv" not in indexName:
@@ -164,7 +164,7 @@ class Backend:
             writer.writerow(["Title", "Desc", "Page", "Book"])
 
     def loadIndex(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         csvpath = self.sessionConfigManager.config["INDEX"]["filePath"]
         if os.path.exists(csvpath):
             self.index = []
@@ -183,7 +183,7 @@ class Backend:
                 self.newIndex()
     
     def saveIndex(self) -> None:
-        self.log.stack()
+        self.log.calledBy()
         csvpath = self.sessionConfigManager.config["INDEX"]["filePath"]
         if csvpath != None or csvpath != "":
             if not os.path.exists(csvpath):
@@ -195,14 +195,14 @@ class Backend:
             self.log.info(f"{csvpath} Saved")
 
     def addToIndex(self, title, desc, page, book):
-        self.log.stack()
+        self.log.calledBy()
         title = ''.join(i for i in title if ord(i)<128)
         desc = ''.join(i for i in desc if ord(i)<128)
         self.index.append([title, desc, page, book])
         self.log.info(f"{book}/{page} {title} added to index")
 
     def getEntriesRefBook(self, book) -> list:
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(f"Search for Entries in book:{book}")
         tmp = []
         for line in self.index:
@@ -211,7 +211,7 @@ class Backend:
         return tmp
     
     def getEntriesRefBookAndPage(self, book, page) -> list:
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(f"Search for Entries in book:{book} page:{page}")
         tmp = []
         for line in self.index:
@@ -220,7 +220,7 @@ class Backend:
         return tmp
     
     def getPageText(self, bookNum=None, pageNum=None) -> str:
-        self.log.stack()
+        self.log.calledBy()
         if bookNum == None and pageNum == None:
             bookNum = self.currentBook
             pageNum = self.currentPage
@@ -231,7 +231,7 @@ class Backend:
         return page.get_text()
     
     def getPagePixmap(self, bookNum=None, pageNum=None) -> str:
-        self.log.stack()
+        self.log.calledBy()
         if bookNum == None and pageNum == None:
             bookNum = self.currentBook
             pageNum = self.currentPage
@@ -244,47 +244,47 @@ class Backend:
         return page.get_pixmap(matrix=mat)
     
     def getCurrentPage(self):
-        self.log.stack()
+        self.log.calledBy()
         return self.currentPage
     
     def getCurrentBook(self):
-        self.log.stack()
+        self.log.calledBy()
         return self.currentBook
     
     def nextPage(self):
-        self.log.stack()
+        self.log.calledBy()
         self.currentPage += 1
 
     def prevPage(self):
-        self.log.stack()
+        self.log.calledBy()
         self.currentPage -= 1
 
     def getMAINzoom(self):
-        self.log.stack()
+        self.log.calledBy()
         return float(self.sessionConfigManager.config["DETAILS"]["zoomMain"])
     def getPDFzoom(self):
-        self.log.stack()
+        self.log.calledBy()
         return float(self.sessionConfigManager.config["DETAILS"]["zoomPDF"])
     def savePDFzoom(self, zoom):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(f"ZOOM PDF to be save: {zoom}")
         self.sessionConfigManager.config["DETAILS"]["zoomPDF"] = str(zoom)
         self.sessionConfigManager.save()
     def saveMAINzoom(self, zoom):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(f"ZOOM Main to be save: {zoom}")
         self.sessionConfigManager.config["DETAILS"]["zoomMain"] = str(zoom)
         self.sessionConfigManager.save()
 
     def checkSessionDetails(self):
-        self.log.stack()
+        self.log.calledBy()
         if self.checkPDFPath() and self.checkIndexPath():
             print("True The details etc")
             return True
         return False
     
     def checkPDFPath(self):
-        self.log.stack()
+        self.log.calledBy()
         potentialPath = self.sessionConfigManager.config["PDF"]["filePath"]
         if potentialPath != "" and potentialPath != None:
             print(f"PDF path: {potentialPath}")
@@ -292,14 +292,14 @@ class Backend:
         return False
     
     def checkPDFPassword(self):
-        self.log.stack()
+        self.log.calledBy()
         potentialPassword = self.sessionConfigManager.config["PDF"]["password"]
         if potentialPassword != "":
             return potentialPassword
         return False
     
     def checkIndexPath(self):
-        self.log.stack()
+        self.log.calledBy()
         potentialPath = self.sessionConfigManager.config["INDEX"]["filePath"]
         if potentialPath != "" and potentialPath != None:
             print(f"Index path: {potentialPath}")

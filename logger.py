@@ -41,7 +41,7 @@ class Logger:
     def exception(self, message):
         self.logger.exception(message)
 
-    def stack(self):
+    def calledBy(self):
         ## Get function that called this function
         stack:list[inspect.FrameInfo]
         try:

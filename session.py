@@ -6,17 +6,17 @@ from configMan import SessionConfig
 class SessionManager:
     def __init__(self) -> None:
         self.log = logger.Logger("SessionMan")
-        self.log.stack()
+        self.log.calledBy()
         self.resetVariables()
 
     def resetVariables(self):
-        self.log.stack()
+        self.log.calledBy()
         self.currentSession = ""
         self.configMan = None
         self.configured = False
     
     def new(self, name:str) -> bool:
-        self.log.stack()
+        self.log.calledBy()
         self.log.info(f"Creating new session {name}")
         if os.path.exists(name):
             return False
@@ -26,7 +26,7 @@ class SessionManager:
         self.open(name)
 
     def open(self, name):
-        self.log.stack()
+        self.log.calledBy()
         self.resetVariables()
         if os.path.exists(name):
             self.configFilePath = f"{name}/index.ini"
@@ -34,7 +34,7 @@ class SessionManager:
             self.loadConfig()
 
     def close(self):
-        self.log.stack()
+        self.log.calledBy()
         if self.currentSession != "":
             self.saveConfig()
             self.resetVariables()

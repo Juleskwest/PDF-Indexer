@@ -6,7 +6,7 @@ class ConfigManager:
     def __init__(self, configfilePath) -> None:
         self.configFilePath = configfilePath
         self.log = Logger(__name__)
-        self.log.stack()
+        self.log.calledBy()
         self.config = configparser.RawConfigParser()
         if os.path.isfile(self.configFilePath):
             self.load()
@@ -14,21 +14,21 @@ class ConfigManager:
             self.default()
     
     def load(self):
-        self.log.stack()
+        self.log.calledBy()
         self.config.read(self.configFilePath)
         self.log.info(f"{self.configFilePath} Loaded")
 
     def default(self):
-        self.log.stack()
+        self.log.calledBy()
         self.log.info("Default Config Created")
         self.save()
     
     def edit(self, cat, option, value):
-        self.log.stack()
+        self.log.calledBy()
         self.config[cat][option] = value
 
     def save(self):
-        self.log.stack()
+        self.log.calledBy()
         try:
             with open(self.configFilePath, 'w') as configfile:
                 self.config.write(configfile)
@@ -41,7 +41,7 @@ class AppConfig(ConfigManager):
         super().__init__(configfilePath)
     
     def default(self):
-        self.log.stack()
+        self.log.calledBy()
         self.config["APP"] = {"lastSession": ""}
         self.config["SETTINGS"] = {"fontSize": 14}
         self.log.info("App Config Created")
@@ -52,7 +52,7 @@ class SessionConfig(ConfigManager):
         super().__init__(configfilePath)
     
     def default(self):
-        self.log.stack()
+        self.log.calledBy()
         self.config["SESSION"] = {"Configured": "False"}
         self.config["PDF"] = {"filePath": "", "password": "", "bookSetName": "", "numberOfBooks": "", "pdfsize": ""}
         self.config["DETAILS"] = {"lastPage":"1", "lastBook":"1", "zoomMain": "1.0", "zoomPDF": "1.0"}

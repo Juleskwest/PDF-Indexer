@@ -10,7 +10,7 @@ class WelcomeTab(ttk.Frame):
         self.height = kw.pop('height', None)
         super().__init__(master=master, **kw)
         self.log = Logger(__name__)
-        self.log.stack()
+        self.log.calledBy()
         
         self.frameWelcome = ttk.Frame(self.notebook, width=800, height=400)
         self.frameWelcome.pack(fill="both", expand=True)
