@@ -22,36 +22,17 @@ class GUI:
         self.config = config
         self.root = tkinter.Tk()
         #self.root.protocol("WM_DELETE_WINDOW", self.__del__) # Might not be needed
-        self.root.bind("<Configure>", self.resize)
-        self.root.minsize(self.config.width,self.config.height)
+        #self.root.bind("<Configure>", self.resize)
+        self.root.minsize(self.config.minwidth,self.config.minheight)
 
         self.resetVariables()
         self.backend = backend.Backend()
         self.updateManager = UpdateManager()
 
-        ## Style Seclection
-        self.style = ttk.Style()
-        #self.changestyle()
-        #self.root.call("source", "arc.tcl")
-        #self.style.theme_use("arc")
-
+        self.changeStyle(self.config.style)
         self.createWidgets()
         
         self.root.title("PDF Indexer.")
-        if self.backend.currentSession != "":
-            #self.root.title(f"PDF Indexer. Current Session: {self.backend.currentSession}")
-            #self.notebook.select(1)
-            #self.PDFpdfviewer.zoomlevel = self.backend.getPDFzoom()
-            #self.Mainpdfviewer.zoomlevel = self.backend.getMAINzoom()
-            pass
-        
-        if self.backend.currentSession == "":
-            self.openWelcomeTab()
-        else:
-            self.openSessionTab()
-            #self.openMainTab()
-            #self.openPDFTab()
-            #self.openIndex()
 
     def resetVariables(self):
         self.openTabs = {}
@@ -61,6 +42,21 @@ class GUI:
         self.PDFPathStrVar = tkinter.StringVar(self.root, "")
         self.PDFPasswordStrVar = tkinter.StringVar(self.root, "")
         self.IndexPathStrVar = tkinter.StringVar(self.root, "")
+
+    def fullLoad(self) -> None:
+        self.log.calledBy()
+        self.app.fullLoad()
+        self.openMainTab()
+        self.openPDFTab()
+        self.openIndexTab()
+
+    def changeStyle(self, stylename):
+        self.log.calledBy()
+        self.log.info(f"Changing style to {stylename}")
+        self.style = ttk.Style()
+        #self.changestyle()
+        #self.root.call("source", "arc.tcl")
+        #self.style.theme_use("arc")
 
     def __del__(self) -> None:
         self.log.calledBy()    
@@ -84,7 +80,7 @@ class GUI:
         self.root.quit()
         self.log.info("Exited from exit()")
 
-    def changestyle(self) -> None:
+    '''def changestyle(self) -> None:
         self.log.calledBy()
         self.log.info("Change Style")
         ## Will need to clean the colours up
@@ -116,7 +112,7 @@ class GUI:
                             #})],
                         })],
                     })]
-                 )
+                 )'''
 
     def createWidgets(self) -> None:
         self.log.calledBy()
@@ -189,12 +185,25 @@ class GUI:
             self.menuHelp.entryconfigure(0, label="Latest Version")
 
 
-    def openWelcomeTab(self):
+    def openWelcomeTab(self) -> None:
         self.log.calledBy()
-        self.welcomeTab = WelcomeTab(self.notebook, self.newSession, self.openSession)
-        
+        self.welcomeTab = WelcomeTab(self.notebook, self.app.newProject, self.app.openProject)
 
-    def openSessionTab(self):
+    def newProject(self) -> str:
+        self.log.calledBy()
+        self.log.info("New Project")
+        name = simpledialog.askstring(title="New Project", prompt="New Project Name:")
+        print(name)
+        while True:
+            if name == "":
+                return False
+            if not self.app.project.exists(name):
+                print(self.app.project.exists(name))
+                print(name)
+                return name
+            name = simpledialog.askstring(title="New Project", prompt="Name already used please pick another:")
+
+    def openProjectConfigTab(self):
         self.log.calledBy()
         self.frameSession = ttk.Frame(self.notebook)
         self.frameSession.pack(fill="both", expand=True)
@@ -480,7 +489,7 @@ class GUI:
             case _:
                 self.log.info(f"Switched to {currentTab}")
 
-    def resize(self, event=None) -> None:
+    '''def resize(self, event=None) -> None:
         if(event.widget == self.root and
            (self.width != event.width or self.height != event.height)):
             self.log.calledBy()
@@ -493,7 +502,7 @@ class GUI:
                     #self.updateMainImage()
                     pass
                 case _:
-                    self.log.info(f"Resized")
+                    self.log.info(f"Resized")'''
 
     def getCurrentTab(self) -> str:
         self.log.calledBy()

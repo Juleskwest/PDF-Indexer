@@ -24,7 +24,7 @@ class Logger:
         self.logger.addHandler(self.c_handler)
         self.logger.addHandler(self.f_handler)
         self.logger.setLevel(logging.DEBUG)
-        self.f_handler.setLevel(logging.ERROR)
+        self.f_handler.setLevel(logging.INFO)
     
     def debug(self, message):
         self.logger.debug(message)

@@ -87,9 +87,23 @@ class ConfigMan:
         self.configParser["DEFAULT"] = {"Replace": "me"}
 
 class AppConfigMan(ConfigMan):
-    def __init__(self, filepath: str = "config.ini") -> None:
+    def __init__(self, filepath: str = "appConfig.ini") -> None:
         super().__init__(filepath)
     
     def default(self):
         self.configParser["App"] = {}
-        self.configParser["Gui"] = {"width":"800", "height":"600"}
+        self.configParser["Gui"] = {"minwidth":"800", 
+                                    "minheight":"400",
+                                    "fontsize":"14",
+                                    "style":"light"
+                                    }
+        self.configParser["Session"] = {"last":""
+                                        }
+        
+class ProjectConfigMan(ConfigMan):
+    def __init__(self, filepath: str = "projectConfig.ini") -> None:
+        super().__init__(filepath)
+    
+    def default(self):
+        self.configParser["Project"] = {"configured":"False"
+                                    }

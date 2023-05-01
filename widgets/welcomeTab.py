@@ -2,10 +2,10 @@ from tkinter import ttk
 from utils.logger import Logger
 
 class WelcomeTab(ttk.Frame):
-    def __init__(self, master, newSessionFunction, openSessionFunction,  **kw):
+    def __init__(self, master, newProjectFunction, openProjectFunction,  **kw):
         self.notebook = master
-        self.newSession = newSessionFunction
-        self.openSession = openSessionFunction
+        self.newProject = newProjectFunction
+        self.openProject = openProjectFunction
         self.width = kw.pop('width', None)
         self.height = kw.pop('height', None)
         super().__init__(master=master, **kw)
@@ -23,7 +23,7 @@ class WelcomeTab(ttk.Frame):
         self.frameWelcome.rowconfigure(2, weight=0)
         self.frameWelcome.rowconfigure(3, weight=3)
 
-        self.welcomeButtonNewSession = ttk.Button(self.frameWelcome, text="Create New Session", command=self.newSession)
-        self.welcomeButtonNewSession.grid(column=1,row=1,sticky="ew")
-        self.welcomeButtonOpenSession = ttk.Button(self.frameWelcome, text="Open New Session", command=self.openSession)
-        self.welcomeButtonOpenSession.grid(column=1,row=2,sticky="ew")
+        self.welcomeButtonNewProject = ttk.Button(self.frameWelcome, text="Create New Project", command=self.newProject)
+        self.welcomeButtonNewProject.grid(column=1,row=1,sticky="ew")
+        self.welcomeButtonOpenProject = ttk.Button(self.frameWelcome, text="Open New Project", command=self.openProject)
+        self.welcomeButtonOpenProject.grid(column=1,row=2,sticky="ew")
