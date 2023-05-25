@@ -10,6 +10,7 @@ class UpdateManager():
         self.remoteVersion = None
         self.newVersionAvaliable = None
         self.files = {}
+        self.offline = False
 
         self.branch = "dev"
         self.versionURL = f"https://raw.githubusercontent.com/Juleskwest/PDF-Indexer/{self.branch}/version.txt"
@@ -23,18 +24,27 @@ class UpdateManager():
 
     def checkRemoteVersion(self):
         self.log.stack()
-        versionfile = requests.get(self.versionURL)
-        self.remoteVersion = versionfile.text
-        self.log.info(f"Remote Version: {self.remoteVersion}")
+        try:
+            versionfile = requests.get(self.versionURL)
+            self.remoteVersion = versionfile.text
+            self.offline = False
+            self.log.info(f"Remote Version: {self.remoteVersion}")
+        except:
+            self.offline = True
+            self.log.exception("No Internet?")
 
     def checkUpdateAvaliable(self):
         self.log.stack()
-        if self.currentVersion < self.remoteVersion:
-            self.newVersionAvaliable = True
-            self.log.info(f"Update Avaliable.")
+        if not self.offline:
+            if self.currentVersion < self.remoteVersion:
+                self.newVersionAvaliable = True
+                self.log.info(f"Update Avaliable.")
+            else:
+                self.newVersionAvaliable = False
+                self.log.info(f"Up to date.")
         else:
             self.newVersionAvaliable = False
-            self.log.info(f"Up to date.")
+            self.log.info("Not Online")
 
     def getFileURLs(self):
         self.log.stack()

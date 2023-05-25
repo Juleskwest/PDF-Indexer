@@ -84,15 +84,15 @@ class PDFViewer(ttk.Frame):
         self.image = ImageTk.PhotoImage(resizedImage)
 
     def _bindMouseWheel(self, event):
-        self.log.stack()
-        self.log.info("Bound")
+        #self.log.stack() # Too many messages
+        #self.log.info("Bound")
         self.bind_all("<MouseWheel>", self._onMouseWheelVert)
         self.bind_all("<Shift-MouseWheel>", self._onMouseWheelHori)
         self.bind_all("<Control-MouseWheel>", self._onMouseWheelZoom)
     
     def _unbindMouseWheel(self, event):
-        self.log.stack()
-        self.log.info("unBound")
+        #self.log.stack() # Too many messages
+        #self.log.info("unBound")
         self.unbind_all("<MouseWheel>")
         self.unbind_all("<Shift-MouseWheel>")
         self.unbind_all("<Control-MouseWheel>")

@@ -3,6 +3,7 @@ import configMan
 import os
 import csv
 from logger import Logger
+import re
 
 class Backend:
     def __init__(self) -> None:
@@ -85,16 +86,19 @@ class Backend:
 
     def closeSession(self) -> None:
         self.log.stack()
-        if self.currentSession != "" and self.checkSessionDetails():
-            self.log.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
-            self.sessionConfigManager.config["DETAILS"]["lastPage"] = str(self.currentPage)
-            self.sessionConfigManager.config["DETAILS"]["lastBook"] = str(self.currentBook)
-            self.sessionConfigManager.save()
-            self.appConfigManager.config["APP"]["lastSession"] = self.currentSession
-            self.appConfigManager.save()
-            self.saveIndex()
-            self.log.info(f"Session {self.currentSession} closed")
-            self.resetVariables()
+        try:
+            if self.currentSession != "" and self.checkSessionDetails():
+                self.log.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
+                self.sessionConfigManager.config["DETAILS"]["lastPage"] = str(self.currentPage)
+                self.sessionConfigManager.config["DETAILS"]["lastBook"] = str(self.currentBook)
+                self.sessionConfigManager.save()
+                self.appConfigManager.config["APP"]["lastSession"] = self.currentSession
+                self.appConfigManager.save()
+                self.saveIndex()
+                self.log.info(f"Session {self.currentSession} closed")
+                self.resetVariables()
+        except:
+            self.log.exception("Ignore if errors on close")
     
     def addPDFPath(self, path) -> None:
         self.log.stack()
@@ -196,8 +200,8 @@ class Backend:
 
     def addToIndex(self, title, desc, page, book):
         self.log.stack()
-        title = ''.join(i for i in title if ord(i)<128)
-        desc = ''.join(i for i in desc if ord(i)<128)
+        title = re.sub(r'[^\x00-\x7F]',' ', title) #''.join(i for i in title if ord(i)<128)
+        desc = re.sub(r'[^\x00-\x7F]',' ', desc) #''.join(i for i in desc if ord(i)<128)
         self.index.append([title, desc, page, book])
         self.log.info(f"{book}/{page} {title} added to index")
 
@@ -224,6 +228,10 @@ class Backend:
         if bookNum == None and pageNum == None:
             bookNum = self.currentBook
             pageNum = self.currentPage
+        if bookNum == None and pageNum == None:
+            bookNum = 1
+            pageNum = 1
+        print(str(bookNum))
         bookName = self.sessionConfigManager.config["BOOKS"][str(bookNum)]
         convertedNumber = int(self.sessionConfigManager.config[bookName]["offset"]) + pageNum
         self.log.info(f"Getting Page {convertedNumber + 1} from pdf")

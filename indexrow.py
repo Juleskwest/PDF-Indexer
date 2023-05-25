@@ -45,18 +45,19 @@ class IndexRow(ttk.Frame):
         self.clearButton = ttk.Button(self, text="Clear", command=self.clear)
         self.clearButton.grid(column=2,columnspan=2, row=5, sticky="ew")
 
-        self.book = ""
-        self.page = ""
-        self.title = ""
-        self.desc = ""
         self.func = None
+        self.bookAdded = False
 
     def addFunc(self, func):
         self.func = func
 
     def save(self, event=None):
         #title, desc, page, book
-        self.func(self.title, self.desc, self.page, self.book)
+        title = self.titleText.get(0.0, tkinter.END).replace("\n", " ")
+        desc = self.descText.get(0.0, tkinter.END).replace("\n", " ")
+        page = self.pageText.get(0.0, tkinter.END).replace("\n", " ")
+        book = self.bookText.get(0.0, tkinter.END).replace("\n", " ")
+        self.func(title, desc, page, book)
         self.clear()
         
     def clear(self, event=None):
@@ -64,21 +65,25 @@ class IndexRow(ttk.Frame):
         self.pageText.delete(0.0, tkinter.END)
         self.titleText.delete(0.0, tkinter.END)
         self.descText.delete(0.0, tkinter.END)
+        self.bookAdded = False
         
     def addBook(self, book):
-        self.book = str(book)
-        self.bookText.insert(tkinter.END, self.book)
+        self.bookText.insert(tkinter.END, str(book))
     def addPage(self, page):
-        self.page = str(page)
-        self.pageText.insert(tkinter.END, self.page)
+        self.pageText.insert(tkinter.END, str(page))
     def addTitle(self, title:str):
-        self.title = title.replace("\n", " ")
-        self.titleText.insert(tkinter.END, self.title)
+        tmp = title.replace("\n", " ")
+        self.titleText.insert(tkinter.END, tmp)
+
     def addDesc(self, desc:str):
-        self.desc = desc.replace("\n", " ")
-        self.descText.insert(tkinter.END, self.desc)
+        tmp = desc.replace("\n", " ")
+        self.descText.insert(tkinter.END, tmp)
 
     def addInfo(self, book, page, title):
-        self.addBook(book)
-        self.addPage(page)
+        print(f"self.boodAdded = False: {self.bookAdded}")
+        if not self.bookAdded:
+            print(f"self.boodAdded = False: {self.bookAdded}")
+            self.addBook(book)
+            self.addPage(page)
+            self.bookAdded = True
         self.addTitle(title)

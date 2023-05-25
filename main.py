@@ -370,6 +370,9 @@ class App:
         if self.backend.checkSessionDetails():
             if self.checkTabOpen("Session"):
                 self.closeTab("Session")
+            self.openPDF()
+            self.proccessPDF()
+            ###################################### need to load properly
             self.openMainTab()
             self.openPDFTab()
             self.openIndexTab()
@@ -408,7 +411,10 @@ class App:
         self.log.stack()
         self.log.info("Closing a Session")
         self.backend.closeSession()
-        self.root.title("PDF Indexer.")
+        try:
+            self.root.title("PDF Indexer.")
+        except:
+            self.log.exception("Ignore if on close")
 
     def newSession(self, event=None) -> None: ############# Look at this then calling open session or a 3rd function both call to reduce duplicate code
         self.log.stack()
@@ -490,7 +496,7 @@ class App:
                 self.log.info(f"Switched to {currentTab}")
 
     def resize(self, event=None) -> None:
-        self.log.stack()
+        #self.log.stack() #too many calls
         if(event.widget == self.root and
            (self.width != event.width or self.height != event.height)):
             self.width, self.height = event.width, event.height
@@ -538,8 +544,10 @@ class App:
     def addTitleToIndexRow(self, event=None):
         self.log.stack()
         tmp = self.textMain.selection_get()
-        self.indexrow.addBook(self.backend.currentBook)
-        self.indexrow.addPage(self.backend.currentPage)
+        if not self.indexrow.bookAdded:
+            self.indexrow.addBook(self.backend.currentBook)
+            self.indexrow.addPage(self.backend.currentPage)
+            self.indexrow.bookAdded = True
         self.indexrow.addTitle(tmp)
 
     def addDescToIndexRow(self, event=None):
