@@ -26,7 +26,7 @@ class GUI:
         self.root.minsize(self.config.minwidth,self.config.minheight)
 
         self.resetVariables()
-        self.backend = backend.Backend()
+        self.backend = backend.Backend() ## will want to remove functionaily from here to app
         self.updateManager = UpdateManager()
 
         self.changeStyle(self.config.style)
