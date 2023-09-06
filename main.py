@@ -17,7 +17,7 @@ class App:
         self.log.info("App Started")
 
         self.root = tkinter.Tk()
-        #self.root.protocol("WM_DELETE_WINDOW", self.__del__) # Might not be needed
+        self.root.protocol("WM_DELETE_WINDOW", self.__del__) # Defintily needed or doesn't capture close
         self.root.bind("<Configure>", self.resize)
         self.root.minsize(800,400)
 
