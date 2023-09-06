@@ -189,14 +189,18 @@ class Backend:
     def saveIndex(self) -> None:
         self.log.stack()
         csvpath = self.sessionConfigManager.config["INDEX"]["filePath"]
-        if csvpath != None or csvpath != "":
-            if not os.path.exists(csvpath):
-                self.log.info(f"{csvpath} Does not exist making now. this is weird")
-            with open(csvpath, "w", newline="") as file:
-                writer = csv.writer(file, quoting=csv.QUOTE_ALL)
-                writer.writerow(["Title", "Desc", "Page", "Book"])
-                writer.writerows(self.index)
-            self.log.info(f"{csvpath} Saved")
+        try:
+            if csvpath != None or csvpath != "":
+                if not os.path.exists(csvpath):
+                    self.log.info(f"{csvpath} Does not exist making now. this is weird")
+                with open(csvpath, "w", newline="") as file:
+                    writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+                    writer.writerow(["Title", "Desc", "Page", "Book"])
+                    writer.writerows(self.index)
+                self.log.info(f"{csvpath} Saved")
+        except Exception as error:
+            self.log.error("Panic")
+            print(self.index)
 
     def addToIndex(self, title, desc, page, book):
         self.log.stack()
@@ -261,11 +265,29 @@ class Backend:
     
     def nextPage(self):
         self.log.stack()
-        self.currentPage += 1
+        bookName = self.sessionConfigManager.config["BOOKS"][str(self.currentBook)]
+        if self.currentPage == int(self.sessionConfigManager.config[bookName]["pages"]) - 2:
+            print(f"new Book!")
+            self.currentBook += 1
+            self.currentPage = 0
+        else:
+            self.currentPage += 1
+        print(f"Currentpage: {self.currentPage}")
+        print(f"Currentbook: {self.currentBook}")
 
     def prevPage(self):
         self.log.stack()
-        self.currentPage -= 1
+        if self.currentPage == 0:
+            if self.currentBook == 1:
+                pass
+            else:
+                self.currentBook -= 1
+                bookName = self.sessionConfigManager.config["BOOKS"][str(self.currentBook)]
+                self.currentPage = int(self.sessionConfigManager.config[bookName]["pages"]) - 1
+        else:
+            self.currentPage -= 1
+        print(f"Currentpage: {self.currentPage}")
+        print(f"Currentbook: {self.currentBook}")
 
     def getMAINzoom(self):
         self.log.stack()
