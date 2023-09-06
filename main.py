@@ -200,7 +200,7 @@ class App:
 
         self.welcomeButtonNewSession = ttk.Button(self.frameWelcome, text="Create New Session", command=self.newSession)
         self.welcomeButtonNewSession.grid(column=1,row=1,sticky="ew")
-        self.welcomeButtonOpenSession = ttk.Button(self.frameWelcome, text="Open New Session", command=self.openSession)
+        self.welcomeButtonOpenSession = ttk.Button(self.frameWelcome, text="Open Session", command=self.openSession)
         self.welcomeButtonOpenSession.grid(column=1,row=2,sticky="ew")
 
     def openSessionTab(self):
@@ -268,7 +268,7 @@ class App:
 
         ttk.Label(self.frameSession, text="").grid(column=1,row=7, sticky="ew", columnspan=3)
 
-        self.sessionTabFinishButton = ttk.Button(self.frameSession, text=" Finish Config ", command=self.openValidSession)
+        self.sessionTabFinishButton = ttk.Button(self.frameSession, text=" Finish Config ", command=self.openCheckSession)
         self.sessionTabFinishButton.grid(column=2,row=8, sticky="ew")
 
     def openMainTab(self):
@@ -365,14 +365,33 @@ class App:
                 return True
         return False
 
-    def openValidSession(self):
+    def openCheckSession(self):
+        self.log.stack()
+        ## Check if PDF has already been proccessed if so don't need to process again
+        if self.backend.sessionConfigManager.config["PDF"]["numberOfBooks"] == "":
+            self.openNewValidSession()
+        else:
+            self.openValidSession()
+
+    def openNewValidSession(self):
         self.log.stack()
         if self.backend.checkSessionDetails():
             if self.checkTabOpen("Session"):
                 self.closeTab("Session")
             self.openPDF()
             self.proccessPDF()
-            ###################################### need to load properly
+            self.backend.currentBook = 1
+            self.backend.currentPage = 1
+            self.openMainTab()
+            self.openPDFTab()
+            self.openIndexTab()
+
+    def openValidSession(self):
+        self.log.stack()
+        if self.backend.checkSessionDetails():
+            if self.checkTabOpen("Session"):
+                self.closeTab("Session")
+            self.openPDF()
             self.openMainTab()
             self.openPDFTab()
             self.openIndexTab()
@@ -559,6 +578,7 @@ class App:
         self.log.stack()
         indexName = simpledialog.askstring(title="Index Name", prompt="Title for index:")
         self.backend.newIndex(indexName)
+        self.IndexPathStrVar.set(self.backend.checkIndexPath())
         pass # Create a dialog to make a new index
     def saveIndex(self, event=None):
         self.log.stack()

@@ -15,6 +15,7 @@ class ConfigManager:
     
     def load(self):
         self.log.stack()
+        self.config = configparser.RawConfigParser()
         self.config.read(self.configFilePath)
         self.log.info(f"{self.configFilePath} Loaded")
 

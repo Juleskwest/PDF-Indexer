@@ -89,6 +89,10 @@ class Backend:
         try:
             if self.currentSession != "" and self.checkSessionDetails():
                 self.log.info(f"current Page and Book: {self.currentPage}, {self.currentBook}")
+                if self.currentBook == None:
+                    self.currentBook = "1"
+                if self.currentPage == None:
+                    self.currentPage = "1"
                 self.sessionConfigManager.config["DETAILS"]["lastPage"] = str(self.currentPage)
                 self.sessionConfigManager.config["DETAILS"]["lastBook"] = str(self.currentBook)
                 self.sessionConfigManager.save()
@@ -236,18 +240,29 @@ class Backend:
             bookNum = 1
             pageNum = 1
         print(str(bookNum))
-        bookName = self.sessionConfigManager.config["BOOKS"][str(bookNum)]
+        bookName = self.getBookName(bookNum)
         convertedNumber = int(self.sessionConfigManager.config[bookName]["offset"]) + pageNum
         self.log.info(f"Getting Page {convertedNumber + 1} from pdf")
         page:fitz.Page = self.pdf.load_page(convertedNumber)
         return page.get_text()
+    
+    def getBookName(self, bookNum):
+        self.log.stack()
+        print(bookNum)
+        print(str(bookNum))
+        print(self.sessionConfigManager.config["BOOKS"][str(bookNum)])
+        print(self.sessionConfigManager)
+        return self.sessionConfigManager.config["BOOKS"][str(bookNum)]
     
     def getPagePixmap(self, bookNum=None, pageNum=None) -> str:
         self.log.stack()
         if bookNum == None and pageNum == None:
             bookNum = self.currentBook
             pageNum = self.currentPage
-        bookName = self.sessionConfigManager.config["BOOKS"][str(bookNum)]
+        if bookNum == None and pageNum == None:
+            bookNum = 1
+            pageNum = 1
+        bookName = self.getBookName(bookNum)
         convertedNumber = int(self.sessionConfigManager.config[bookName]["offset"]) + pageNum
         self.log.info(f"Getting Page Pixmap {convertedNumber + 1} from pdf")
         page:fitz.Page = self.pdf.load_page(convertedNumber)
@@ -265,7 +280,7 @@ class Backend:
     
     def nextPage(self):
         self.log.stack()
-        bookName = self.sessionConfigManager.config["BOOKS"][str(self.currentBook)]
+        bookName = self.getBookName(self.currentBook)
         if self.currentPage == int(self.sessionConfigManager.config[bookName]["pages"]) - 2:
             print(f"new Book!")
             self.currentBook += 1
@@ -282,7 +297,7 @@ class Backend:
                 pass
             else:
                 self.currentBook -= 1
-                bookName = self.sessionConfigManager.config["BOOKS"][str(self.currentBook)]
+                bookName = self.getBookName(self.currentBook)
                 self.currentPage = int(self.sessionConfigManager.config[bookName]["pages"]) - 1
         else:
             self.currentPage -= 1
